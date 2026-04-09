@@ -115,19 +115,7 @@ Responsibilities:
 
 ## Environment Setup
 
-### Option 1: Conda environment file
-
 ```bash
-cd "/Users/behruzgurbanli/Downloads/Project 4"
-conda env create -f environment-p4.yml
-conda activate nlp-p4
-```
-
-### Option 2: Existing Conda environment
-
-```bash
-cd "/Users/behruzgurbanli/Downloads/Project 4"
-conda activate YOUR_ENV_NAME
 python -m pip install -r requirements-p4.txt
 ```
 
@@ -148,16 +136,12 @@ Main packages:
 ### 1. Generate Task 1 report
 
 ```bash
-cd "/Users/behruzgurbanli/Downloads/Project 4"
-conda activate nlp-p4
 PYTHONPATH=src python -m nlp_project.cli task p4-sentiment --config configs/task_p4_sentiment.yaml
 ```
 
 ### 2. Generate Task 2 prepare report
 
 ```bash
-cd "/Users/behruzgurbanli/Downloads/Project 4"
-conda activate nlp-p4
 PYTHONPATH=src python -m nlp_project.cli task p4-qa --config configs/task_p4_qa.yaml
 ```
 
@@ -166,8 +150,6 @@ PYTHONPATH=src python -m nlp_project.cli task p4-qa --config configs/task_p4_qa.
 Example:
 
 ```bash
-cd "/Users/behruzgurbanli/Downloads/Project 4"
-conda activate nlp-p4
 PYTHONPATH=src python - <<'PY'
 from pathlib import Path
 from nlp_project.p4.task2_qa import P4Task2QAConfig, run_p4_task2_qa
@@ -195,8 +177,6 @@ PY
 ### 4. Run the Dash UI
 
 ```bash
-cd "/Users/behruzgurbanli/Downloads/Project 4"
-conda activate nlp-p4
 bash src/scripts/run_ui_p4_dash.sh
 ```
 
@@ -214,18 +194,6 @@ From the stronger saved comparison run:
 
 This is the main empirical result of the project.
 
-## Reports
-
-The LaTeX report source is located at:
-- `report/project4_report.tex`
-
-Compile with:
-
-```bash
-cd "/Users/behruzgurbanli/Downloads/Project 4/report"
-pdflatex project4_report.tex
-pdflatex project4_report.tex
-```
 
 ## Notes
 
