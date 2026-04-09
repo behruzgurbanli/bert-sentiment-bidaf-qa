@@ -1,0 +1,29 @@
+train_path: "dataset/squad/train-v1.1.json"
+dev_path: "dataset/squad/dev-v1.1.json"
+runtime_model_name: "distilbert-base-cased-distilled-squad"
+bert_embedding_model_name: "bert-base-uncased"
+max_context_tokens: 160
+max_question_tokens: 32
+sample_count: 5
+min_word_count: 2
+batch_size: 16
+epochs: 3
+learning_rate: 0.001
+bert_learning_rate: 0.00002
+hidden_size: 64
+word_embedding_dim: 100
+dropout: 0.2
+freeze_bert: true
+max_answer_len: 30
+prepare_only: true
+train_word_bidaf: true
+train_bert_bidaf: false
+max_train_examples: 0
+max_dev_examples: 0
+max_eval_examples: 0
+try_runtime_inference: false
+local_files_only: false
+demo_question: "When did Beyonce start becoming popular?"
+demo_context: "Beyonce Giselle Knowles-Carter became popular in the late 1990s as the lead singer of Destiny's Child."
+out_dir: "data/reports/p4_task2_qa"
+out_json: "data/reports/p4_task2_qa_prepare_report.json"

@@ -1,0 +1,146 @@
+\documentclass[10pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{amsmath}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!50!black,
+  urlcolor=blue!50!black,
+  citecolor=blue!50!black
+}
+
+\setlist[itemize]{leftmargin=1.2em, topsep=0.25em, itemsep=0.2em}
+\setlength{\parskip}{0.45em}
+\setlength{\parindent}{0pt}
+
+\title{\textbf{Course Project 4}\\Sentiment Analysis using BERT and Reading Comprehension with BiDAF and BERT}
+\author{Team Members: \textit{[Fill in names here]}}
+\date{\textit{Spring 2026}}
+
+\begin{document}
+\maketitle
+
+\section{Motivation}
+This project covers two NLP problems required by the assignment: sentiment analysis and extractive question answering. Task~1 studies a fine-tuned BERT-family sentiment classifier on IMDb. Task~2 implements a BiDAF-style reading comprehension system on SQuAD~1.1 and compares a non-contextual word-embedding baseline against a BERT-enhanced version. The main objective is to test whether contextual BERT embeddings improve question answering quality.
+
+\section{Datasets and Setting}
+\textbf{Task 1: IMDb.} The dataset contains 25{,}000 training reviews and 25{,}000 test reviews, with balanced positive and negative labels. This is a clean binary setting for sentiment analysis.
+
+\textbf{Task 2: SQuAD 1.1.} The dataset contains answerable question-context pairs where the target is a span inside the context passage. After preprocessing and answer-span alignment, 87{,}599 training examples and 10{,}570 development examples remained usable.
+
+\section{Method}
+\subsection{Task 1: Sentiment Analysis using a Fine-Tuned BERT-Family Model}
+For Task~1 we analyzed the open-source model \texttt{distilbert-base-uncased-finetuned-sst-2-english}. It is a sequence-classification model suitable for binary sentiment prediction.
+
+\textbf{Inputs and outputs.} The input is a review text tokenized into transformer inputs such as \texttt{input\_ids} and \texttt{attention\_mask}. The output is a sentiment label with confidence.
+
+\textbf{Number of classes.} The model has 2 classes: \texttt{NEGATIVE} and \texttt{POSITIVE}.
+
+\textbf{Input size.} The maximum input size is 512 tokens.
+
+\textbf{Case sensitivity.} The selected model is uncased, so capitalization is normalized during tokenization. This usually improves robustness on noisy user text, but it also removes any signal that might be carried by capitalization.
+
+\textbf{Agglutinative languages.} The model cannot be assumed to work well on Azerbaijani without additional evidence. Azerbaijani is agglutinative, so subword fragmentation and domain mismatch may reduce performance. A multilingual model and in-domain evaluation would be needed before making strong claims.
+
+Sentiment prediction is standard sequence classification. If $h \in \mathbb{R}^{d}$ is the pooled review representation, then the classifier produces logits $z = Wh + b$, and the class probabilities are
+\[
+p(y \mid x) = \mathrm{softmax}(z).
+\]
+
+\subsection{Task 2: BiDAF Baseline and BERT Integration}
+Task~2 was implemented in PyTorch. The system takes a question and a context passage as input and predicts answer start and end positions. The pipeline contains:
+\begin{itemize}
+\item tokenization with answer-span alignment from character offsets to token offsets,
+\item truncation of long contexts while preserving the gold answer span,
+\item a BiDAF-style architecture with context-question attention,
+\item a baseline with trainable word embeddings,
+\item a comparison model that replaces the word embedding input with contextual BERT-Base embeddings.
+\end{itemize}
+
+Let $C \in \mathbb{R}^{T_c \times d}$ be the context representation and $Q \in \mathbb{R}^{T_q \times d}$ be the question representation. Both are encoded with bidirectional LSTMs. A similarity matrix is computed between context and question tokens, then used to form context-to-question and question-to-context attention. The fused representation is modeled by another bidirectional LSTM, and two linear layers produce start and end logits over context positions:
+\[
+p_{\text{start}} = \mathrm{softmax}(W_s H), \qquad
+p_{\text{end}} = \mathrm{softmax}(W_e H),
+\]
+where $H$ is the final context-aware representation. Training minimizes the sum of cross-entropy losses for the gold start and end positions.
+
+Our implementation follows the standard BiDAF idea of combining the context token, the attended question token, and multiplicative interaction features. After encoding, the model builds
+\[
+G = [C;\tilde{Q};C \odot \tilde{Q};C \odot \tilde{C}],
+\]
+where $\tilde{Q}$ is the context-to-question representation, $\tilde{C}$ is the question-aware context summary, and $\odot$ denotes elementwise multiplication.
+
+For the BERT-enhanced setting, \texttt{bert-base-uncased} is used to generate contextual token-level embeddings for both the question and the context. These embeddings are then fed into the same BiDAF-style attention and output layers. In our main comparison runs, BERT was used as a frozen contextual encoder.
+
+The main settings were max context length $=160$, max question length $=32$, hidden size $=64$, dropout $=0.2$, and maximum answer span length $=30$. For the stronger comparison run, we used batch size $=4$, two epochs, and frozen BERT embeddings.
+
+\section{Experiments}
+\subsection{Task 1}
+Task~1 is an analysis task rather than a training task. The implementation validates IMDb, exposes the required model properties, and supports optional runtime inference on custom reviews.
+
+\subsection{Task 2 Experimental Setup}
+We ran progressive Task~2 experiments to verify the training pipeline and compare the baseline against the BERT-enhanced model. We first used smaller subsets for sanity checks, then increased the subset size for a stronger comparison. The main metrics are Exact Match (EM) and token-level F1.
+
+The experiments were intentionally incremental:
+\begin{itemize}
+\item a small word-only baseline run to verify that the model trains and produces non-trivial EM/F1 values,
+\item a small word-vs-BERT comparison to check whether contextual embeddings improve the baseline in the expected direction,
+\item a stronger medium-size comparison on the same configuration family to obtain the main result used in the report.
+\end{itemize}
+
+Table~\ref{tab:qa-results} summarizes the saved runs.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lcccc}
+\toprule
+Run & Train / Eval & Model & EM & F1 \\
+\midrule
+Small baseline & 1000 / 200 & BiDAF word baseline & 0.0300 & 0.0803 \\
+Small compare & 1000 / 200 & BiDAF + BERT & 0.0800 & 0.1231 \\
+Medium baseline & 3000 / 400 & BiDAF word baseline & 0.1075 & 0.1469 \\
+Medium compare & 3000 / 400 & BiDAF + BERT & 0.2600 & 0.3158 \\
+\bottomrule
+\end{tabular}
+\caption{Task 2 reading comprehension results on saved subset experiments.}
+\label{tab:qa-results}
+\end{table}
+
+The most informative comparison is the medium run. On the same 3000/400 subset setting, the BERT-enhanced model improved EM by $+0.1525$ and F1 by $+0.1689$ over the word-embedding baseline. This is a clear positive result: contextual embeddings improved answer extraction quality in our implementation.
+
+\section{Results and Discussion}
+\subsection{Task 1}
+Task~1 satisfies the required items directly: the model input and output are identified, the number of classes is 2, the maximum input size is 512 tokens, the model is uncased, and the Azerbaijani limitation is discussed. IMDb is a suitable dataset because it matches the binary sentiment setting cleanly.
+
+\subsection{Task 2}
+Task~2 also satisfies the required items: a BiDAF-style PyTorch model was implemented, it predicts start and end answer positions, BERT-Base contextual embeddings were integrated, and both variants were evaluated with EM and F1. The results show that the word baseline learns, but the BERT-enhanced model is consistently stronger. In the medium comparison run, BiDAF + BERT reached EM $=0.2600$ and F1 $=0.3158$, while the word baseline reached EM $=0.1075$ and F1 $=0.1469$. This supports the claim that contextual embeddings improved answer extraction quality in our implementation.
+
+\section{Team Contributions}
+\textit{Fill in this section with the actual division of work before submission. A recommended format is:}
+\begin{itemize}
+\item Member 1: dataset preparation, Task~1 implementation, UI integration.
+\item Member 2: Task~2 modeling, training experiments, report writing.
+\item Member 3 (if applicable): interface design, testing, presentation preparation.
+\end{itemize}
+
+\section*{References}
+Seo, M., Kembhavi, A., Farhadi, A., and Hajishirzi, H. Bidirectional Attention Flow for Machine Comprehension. ICLR 2017.
+
+Devlin, J., Chang, M.-W., Lee, K., and Toutanova, K. BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding. NAACL 2019.
+
+Rajpurkar, P., Zhang, J., Lopyrev, K., and Liang, P. SQuAD: 100,000+ Questions for Machine Comprehension of Text. EMNLP 2016.
+
+Maas, A. L., Daly, R. E., Pham, P. T., Huang, D., Ng, A. Y., and Potts, C. Learning Word Vectors for Sentiment Analysis. ACL 2011.
+
+\end{document}

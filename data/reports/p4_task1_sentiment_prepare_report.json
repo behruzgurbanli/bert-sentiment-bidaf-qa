@@ -1,0 +1,177 @@
+{
+  "task": "project4_task1_sentiment",
+  "dataset": {
+    "name": "IMDb Large Movie Review Dataset",
+    "dataset_dir": "dataset/aclImdb",
+    "active_project_dataset": true,
+    "splits": {
+      "train": {
+        "count": 25000,
+        "label_counts": {
+          "neg": 12500,
+          "pos": 12500
+        },
+        "avg_word_count": 233.79
+      },
+      "test": {
+        "count": 25000,
+        "label_counts": {
+          "neg": 12500,
+          "pos": 12500
+        },
+        "avg_word_count": 228.53
+      }
+    },
+    "full_counts": {
+      "train": 25000,
+      "test": 25000,
+      "total_labeled": 50000
+    },
+    "class_labels": [
+      "neg",
+      "pos"
+    ]
+  },
+  "model_analysis": {
+    "model_name": "distilbert-base-uncased-finetuned-sst-2-english",
+    "task_type": "sequence_classification",
+    "inputs": [
+      "Single review text string",
+      "Tokenizer output such as input_ids and attention_mask"
+    ],
+    "outputs": [
+      "Class logits",
+      "Predicted sentiment label",
+      "Confidence scores after softmax"
+    ],
+    "num_classes": 2,
+    "class_labels": [
+      "NEGATIVE",
+      "POSITIVE"
+    ],
+    "max_input_tokens": 512,
+    "case_sensitive": false,
+    "case_sensitivity_effect": "The selected model is uncased, so capitalization is normalized during tokenization. That usually improves robustness on noisy text, but removes some case-based signals.",
+    "imdb_alignment_note": "IMDb is a binary sentiment dataset, so a binary sequence-classification BERT model is the cleanest fit for demos, evaluation, and report discussion.",
+    "agglutinative_language_note": "The English IMDb setup is not sufficient evidence for Azerbaijani performance. Azerbaijani is agglutinative, so subword fragmentation and domain mismatch can hurt results unless the model is multilingual and additionally evaluated or fine-tuned on relevant data."
+  },
+  "samples": {
+    "train": [
+      {
+        "example_id": "train/pos/0_9",
+        "label": "pos",
+        "rating": 9,
+        "text_preview": "Bromwell High is a cartoon comedy. It ran at the same time as some other programs about school life, such as \"Teachers\". My 35 years in the teaching profession lead me to believe that Bromwell High's satire is much closer to reality than is"
+      },
+      {
+        "example_id": "train/pos/10000_8",
+        "label": "pos",
+        "rating": 8,
+        "text_preview": "Homelessness (or Houselessness as George Carlin stated) has been an issue for years but never a plan to help those on the street that were once considered human who did everything from going to school, work, or vote for the matter. Most peo"
+      },
+      {
+        "example_id": "train/pos/10001_10",
+        "label": "pos",
+        "rating": 10,
+        "text_preview": "Brilliant over-acting by Lesley Ann Warren. Best dramatic hobo lady I have ever seen, and love scenes in clothes warehouse are second to none. The corn on face is a classic, as good as anything in Blazing Saddles. The take on lawyers is als"
+      }
+    ],
+    "test": [
+      {
+        "example_id": "test/pos/0_10",
+        "label": "pos",
+        "rating": 10,
+        "text_preview": "I went and saw this movie last night after being coaxed to by a few friends of mine. I'll admit that I was reluctant to see it because from what I knew of Ashton Kutcher he was only able to do comedy. I was wrong. Kutcher played the charact"
+      },
+      {
+        "example_id": "test/pos/10000_7",
+        "label": "pos",
+        "rating": 7,
+        "text_preview": "Actor turned director Bill Paxton follows up his promising debut, the Gothic-horror \"Frailty\", with this family friendly sports drama about the 1913 U.S. Open where a young American caddy rises from his humble background to play against his"
+      },
+      {
+        "example_id": "test/pos/10001_9",
+        "label": "pos",
+        "rating": 9,
+        "text_preview": "As a recreational golfer with some knowledge of the sport's history, I was pleased with Disney's sensitivity to the issues of class in golf in the early twentieth century. The movie depicted well the psychological battles that Harry Vardon "
+      }
+    ]
+  },
+  "runtime": {
+    "attempted": false,
+    "available": false,
+    "model_loaded": false,
+    "notes": [
+      "Runtime inference is disabled by config. Enable it when running inside your Conda environment."
+    ]
+  },
+  "demo_predictions": [],
+  "ui_summary": {
+    "headline_metrics": {
+      "train_reviews": 25000,
+      "test_reviews": 25000,
+      "num_classes": 2,
+      "max_input_tokens": 512,
+      "case_sensitive": false,
+      "runtime_model_loaded": false
+    },
+    "key_points": [
+      "Input: Single review text string",
+      "Output: Predicted sentiment label",
+      "IMDb labels: neg, pos",
+      "IMDb is a binary sentiment dataset, so a binary sequence-classification BERT model is the cleanest fit for demos, evaluation, and report discussion.",
+      "The English IMDb setup is not sufficient evidence for Azerbaijani performance. Azerbaijani is agglutinative, so subword fragmentation and domain mismatch can hurt results unless the model is multilingual and additionally evaluated or fine-tuned on relevant data."
+    ],
+    "demo_predictions": [],
+    "sample_reviews": {
+      "train": [
+        {
+          "example_id": "train/pos/0_9",
+          "label": "pos",
+          "rating": 9,
+          "text_preview": "Bromwell High is a cartoon comedy. It ran at the same time as some other programs about school life, such as \"Teachers\". My 35 years in the teaching profession lead me to believe that Bromwell High's satire is much closer to reality than is"
+        },
+        {
+          "example_id": "train/pos/10000_8",
+          "label": "pos",
+          "rating": 8,
+          "text_preview": "Homelessness (or Houselessness as George Carlin stated) has been an issue for years but never a plan to help those on the street that were once considered human who did everything from going to school, work, or vote for the matter. Most peo"
+        },
+        {
+          "example_id": "train/pos/10001_10",
+          "label": "pos",
+          "rating": 10,
+          "text_preview": "Brilliant over-acting by Lesley Ann Warren. Best dramatic hobo lady I have ever seen, and love scenes in clothes warehouse are second to none. The corn on face is a classic, as good as anything in Blazing Saddles. The take on lawyers is als"
+        }
+      ],
+      "test": [
+        {
+          "example_id": "test/pos/0_10",
+          "label": "pos",
+          "rating": 10,
+          "text_preview": "I went and saw this movie last night after being coaxed to by a few friends of mine. I'll admit that I was reluctant to see it because from what I knew of Ashton Kutcher he was only able to do comedy. I was wrong. Kutcher played the charact"
+        },
+        {
+          "example_id": "test/pos/10000_7",
+          "label": "pos",
+          "rating": 7,
+          "text_preview": "Actor turned director Bill Paxton follows up his promising debut, the Gothic-horror \"Frailty\", with this family friendly sports drama about the 1913 U.S. Open where a young American caddy rises from his humble background to play against his"
+        },
+        {
+          "example_id": "test/pos/10001_9",
+          "label": "pos",
+          "rating": 9,
+          "text_preview": "As a recreational golfer with some knowledge of the sport's history, I was pleased with Disney's sensitivity to the issues of class in golf in the early twentieth century. The movie depicted well the psychological battles that Harry Vardon "
+        }
+      ]
+    }
+  },
+  "status": {
+    "stage": "dataset_ready_and_runtime_optional",
+    "ready_for_model_work": true,
+    "notes": [
+      "IMDb is the active Task 1 dataset in this project root.",
+      "This report supports both static instructor-facing analysis and optional runtime demos."
+    ]
+  }
+}
